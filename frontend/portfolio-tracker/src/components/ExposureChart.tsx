@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Box, Typography } from '@mui/material';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, type PieLabelRenderProps } from 'recharts';
 import type { ExposureDto } from '../types/portfolio';
@@ -37,27 +38,27 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   );
 }
 
-export default function ExposureChart({ exposure }: ExposureChartProps) {
+const renderLabel = (props: PieLabelRenderProps) => {
+  const { name, value } = props;
+  return `${name} ${Number(value).toFixed(0)}%`;
+};
+
+export default memo(function ExposureChart({ exposure }: ExposureChartProps) {
   if (!exposure) return null;
 
-  const sectorData = exposure.bySector.map((s) => ({
+  const sectorData = useMemo(() => exposure.bySector.map((s) => ({
     name: s.sector,
     value: s.weight,
     marketValue: s.marketValue,
     weight: s.weight,
-  }));
+  })), [exposure]);
 
-  const assetClassData = exposure.byAssetClass.map((a) => ({
+  const assetClassData = useMemo(() => exposure.byAssetClass.map((a) => ({
     name: a.assetClass,
     value: a.weight,
     marketValue: a.marketValue,
     weight: a.weight,
-  }));
-
-  const renderLabel = (props: PieLabelRenderProps) => {
-    const { name, value } = props;
-    return `${name} ${Number(value).toFixed(0)}%`;
-  };
+  })), [exposure]);
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
@@ -96,4 +97,4 @@ export default function ExposureChart({ exposure }: ExposureChartProps) {
       </Box>
     </Box>
   );
-}
+});

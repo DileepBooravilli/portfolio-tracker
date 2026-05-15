@@ -15,6 +15,26 @@ public class MarketSimulator : BackgroundService
     private readonly ILogger<MarketSimulator> _logger;
     private readonly Random _random = new();
 
+    // Per-asset drift: positive = bullish, negative = bearish
+    private static readonly Dictionary<string, double> AssetDrift = new()
+    {
+        ["AAPL"] = 0.0005,   // slight bull
+        ["MSFT"] = 0.0008,   // moderate bull
+        ["GOOGL"] = -0.0006, // bearish
+        ["AMZN"] = 0.0003,   // slight bull
+        ["TSLA"] = -0.0012,  // strong bear (volatile)
+        ["JPM"] = 0.0004,    // slight bull
+        ["JNJ"] = -0.0003,   // slight bear
+        ["V"] = 0.0006,      // moderate bull
+        ["NVDA"] = 0.001,    // strong bull
+        ["META"] = -0.0008,  // moderate bear
+        ["BRK.B"] = 0.0002,  // flat-ish bull
+        ["XOM"] = -0.0005,   // slight bear
+        ["UNH"] = 0.0004,    // slight bull
+        ["AGG"] = -0.0001,   // near flat (bond ETF)
+        ["GLD"] = 0.0003,    // slight bull (safe haven)
+    };
+
     public MarketSimulator(
         InMemoryStore store,
         IHubContext<PortfolioHub, IPortfolioHubClient> hubContext,
@@ -51,8 +71,9 @@ public class MarketSimulator : BackgroundService
 
                 // Generate realistic price movement: -1.5% to +1.5%
                 var changePercent = (_random.NextDouble() * 3.0 - 1.5) / 100.0;
-                // Add slight upward bias for more interesting demo
-                changePercent += 0.001;
+                // Per-asset drift: some stocks trend up, others down
+                var drift = AssetDrift.GetValueOrDefault(symbol, 0.0);
+                changePercent += drift;
 
                 var previousPrice = asset.CurrentPrice;
                 var newPrice = Math.Round(asset.CurrentPrice * (1 + (decimal)changePercent), 2);
