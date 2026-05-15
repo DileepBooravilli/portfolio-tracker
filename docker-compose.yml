@@ -1,0 +1,14 @@
+services:
+  backend:
+    build:
+      context: ./backend/PortfolioTracker.Api
+    ports:
+      - "5152:5152"
+
+  frontend:
+    build:
+      context: ./frontend/portfolio-tracker
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
