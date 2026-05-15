@@ -2,7 +2,7 @@
 
 ## Tool Used
 
-**GitHub Copilot** (Claude Opus 4) via VS Code Agent mode — used as the primary AI-assisted development tool throughout the entire project.
+**GitHub Copilot** (Claude Opus 4.6) via VS Code Agent mode — used as the primary AI-assisted development tool throughout the entire project.
 
 ## How AI Was Used
 
